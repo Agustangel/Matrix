@@ -13,6 +13,13 @@
 #include <type_traits>
 
 namespace containers {
+#if defined(__x86_64__)
+static unsigned BOOST_ARCH_WORD_BITS = 64;
+#elif defined(__i386__)
+static unsigned BOOST_ARCH_WORD_BITS = 32;
+#else
+static unsigned BOOST_ARCH_WORD_BITS = 32;
+#endif
 
 template <typename T> class vector {
 private:
@@ -29,7 +36,9 @@ public:
         buf_capacity_ptr{buf_begin_ptr + default_capacity},
         buf_end_ptr{buf_begin_ptr} {};
 
-  void vector_expand(std::size_t cap) {
+  // vector(std::size_t count, T val = T{}) : {};
+
+  void expand(std::size_t cap) {
     if (cap <= capacity())
       return;
 
@@ -44,6 +53,18 @@ public:
     buf_begin_ptr = raii_buf.release();
     buf_end_ptr = buf_begin_ptr + sz;
     buf_capacity_ptr = buf_begin_ptr + cap;
+  }
+
+private:
+  void expand_if_neccessary() {
+    if (buf_capacity_ptr - buf_end_ptr > 0)
+      return;
+    expand(amortized(capacity()));
+  }
+
+public:
+  std::size_t amortized(std::size_t sz) const {
+    return std::size_t{1} << (BOOST_ARCH_WORD_BITS - __builtin_clz(sz));
   }
 
   std::size_t size() const noexcept { return buf_end_ptr - buf_begin_ptr; }
