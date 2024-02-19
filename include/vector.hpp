@@ -97,6 +97,18 @@ class vector {
     return std::size_t{1} << (BOOST_ARCH_WORD_BITS - __builtin_clz(sz));
   }
 
+  void push_back(T&& value) {
+    expand_if_neccessary();
+    new (buf_end_ptr++) T{std::move(value)};
+  }
+
+  void push_back(const T& value) {
+    expand_if_neccessary();
+    new (buf_end_ptr++) T{value};  // new gives a strict guarantee
+  }
+
+  void clear() noexcept { std::destroy(buf_begin_ptr, buf_end_ptr); }
+
   std::size_t size() const noexcept { return buf_end_ptr - buf_begin_ptr; }
   std::size_t capacity() const noexcept {
     return buf_capacity_ptr - buf_begin_ptr;
