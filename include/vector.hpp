@@ -73,6 +73,23 @@ class vector {
     *this = std::move(tmp);
   }
 
+  vector& operator=(vector&& rhs) noexcept {
+    if (this == std::addressof(rhs))
+      return *this;
+    std::swap(buf_begin_ptr, rhs.buf_begin_ptr);
+    std::swap(buf_end_ptr, rhs.buf_end_ptr);
+    std::swap(buf_capacity_ptr, rhs.buf_capacity_ptr);
+    return *this;
+  }
+
+  vector& operator=(const vector& rhs) {
+    if (this == std::addressof(rhs))
+      return *this;
+    vector tmp{rhs};
+    std::swap(this*, tmp);
+    return *this;
+  }
+
  private:
   void expand(std::size_t cap) {
     if (cap <= capacity())
