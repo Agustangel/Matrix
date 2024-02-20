@@ -11,6 +11,7 @@
 #include <optional>
 #include <stdexcept>
 #include <utility>
+#include "iterator.hpp"
 
 namespace linmath {
 template <typename T>

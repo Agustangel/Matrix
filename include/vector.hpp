@@ -11,6 +11,7 @@
 #include <memory>
 #include <stdexcept>
 #include <type_traits>
+#include "iterator.hpp"
 
 namespace containers {
 static constexpr unsigned BOOST_ARCH_WORD_BITS = 32;
