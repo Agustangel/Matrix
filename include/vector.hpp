@@ -34,8 +34,7 @@ class vector {
   explicit vector(std::size_t count, T val = T{}) {
     vector<T> tmp{};
     tmp.expand(count);
-    std::ranges::copy(std::views::repeat_n(value, count),
-                      std::back_inserter(tmp));
+    std::fill_n(std::back_inserter(tmp), count, val);
 
     *this = std::move(tmp);
   };
@@ -63,9 +62,18 @@ class vector {
     vector tmp{};
     tmp.expand(rhs.capacity());
 
+    std::size_t sz = rhs.size();
+    if constexpr (std::is_trivially_copyable<T>::value)
+      std::memcpy(tmp.buf_begin_ptr, rhs.buf_begin_ptr, sz * sizeof(T));
+    else
+      std::uninitialized_copy(rhs.buf_begin_ptr, rhs.buf_end_ptr,
+                              tmp.buf_begin_ptr);
+    tmp.buf_end_ptr = tmp.buf_begin_ptr + sz;
+
     *this = std::move(tmp);
   }
 
+ private:
   void expand(std::size_t cap) {
     if (cap <= capacity())
       return;
@@ -82,10 +90,9 @@ class vector {
     ::operator delete(buf_begin_ptr);
     buf_begin_ptr = raii_buf.release();
     buf_end_ptr = buf_begin_ptr + sz;
-    buf_capacity_ptr = buf_begin_ptr + cap;
+    buf_capacity_ptr += cap;
   }
 
- private:
   void expand_if_neccessary() {
     if (buf_capacity_ptr - buf_end_ptr > 0)
       return;
@@ -106,6 +113,14 @@ class vector {
     expand_if_neccessary();
     new (buf_end_ptr++) T{value};  // new gives a strict guarantee
   }
+
+  void pop() noexcept { std::destroy_at(--buf_end_ptr); }
+
+  T& front() & { return *buf_begin_ptr; }
+  const T& front() const& { return *buf_begin_ptr; }
+
+  T& top() & { return *(buf_end_ptr - 1); }
+  const T& top() const& { return *(buf_end_ptr - 1); }
 
   void clear() noexcept { std::destroy(buf_begin_ptr, buf_end_ptr); }
 
