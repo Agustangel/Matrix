@@ -25,6 +25,8 @@ class shell_matrix {
   containers::vector<T> m_buffer;
 
  public:
+  using it = iterator::myIterator<T>;
+
   shell_matrix(std::size_t rows, std::size_t cols, T val_ = T{})
       : n_rows{rows}, n_cols{cols}, m_buffer{rows * cols, val_} {}
 

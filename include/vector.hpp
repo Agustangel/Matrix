@@ -26,6 +26,8 @@ class vector {
   static constexpr std::size_t default_capacity = 8;
 
  public:
+  using it = iterator::myIterator<T>;
+
   vector()
       : buf_begin_ptr{static_cast<T*>(
             ::operator new(sizeof(T) * default_capacity))},
@@ -151,5 +153,8 @@ class vector {
   }
 
   bool empty() const noexcept { return (size() == 0); }
+
+  it end() const { return it{buf_end_ptr}; }
+  it begin() const { return it{buf_begin_ptr}; }
 };
 }  // namespace containers
