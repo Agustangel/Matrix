@@ -12,4 +12,7 @@
 #include <stdexcept>
 #include <utility>
 
-namespace linmath {} // namespace linmath
+namespace linmath {
+template <typename T>
+class matrix {};
+}  // namespace linmath

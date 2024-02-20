@@ -37,5 +37,11 @@ class shell_matrix {
   static shell_matrix zero(std::size_t rows, std::size_t cols) {
     return shell_matrix{rows, cols};
   }
+
+  static shell_matrix identity(std::size_t sz) {
+    shell_matrix ret{sz, sz};
+    // need iterator
+    for (std::size_t i = 0; i != sz; ++i) {};
+  }
 };
 }  // namespace linmath
