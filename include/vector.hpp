@@ -86,7 +86,7 @@ class vector {
     if (this == std::addressof(rhs))
       return *this;
     vector tmp{rhs};
-    std::swap(this*, tmp);
+    std::swap(*this, tmp);
     return *this;
   }
 
