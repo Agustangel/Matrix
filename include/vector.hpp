@@ -142,9 +142,6 @@ class vector {
   T& top() { return *(buf_end_ptr - 1); }
   const T& top() const { return *(buf_end_ptr - 1); }
 
-  T* data() { return buf_begin_ptr; }
-  const T* data() const { return buf_begin_ptr; }
-
   void clear() noexcept { std::destroy(buf_begin_ptr, buf_end_ptr); }
 
   std::size_t size() const noexcept { return buf_end_ptr - buf_begin_ptr; }
