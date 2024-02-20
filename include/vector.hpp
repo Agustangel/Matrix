@@ -90,6 +90,9 @@ class vector {
     return *this;
   }
 
+  T& operator[](unsigned i) { return *(buf_begin_ptr + i); }
+  const T& operator[](unsigned i) const { return *(buf_begin_ptr + i); }
+
  private:
   void expand(std::size_t cap) {
     if (cap <= capacity())
@@ -133,11 +136,14 @@ class vector {
 
   void pop() noexcept { std::destroy_at(--buf_end_ptr); }
 
-  T& front() & { return *buf_begin_ptr; }
-  const T& front() const& { return *buf_begin_ptr; }
+  T& front() { return *buf_begin_ptr; }
+  const T& front() const { return *buf_begin_ptr; }
 
-  T& top() & { return *(buf_end_ptr - 1); }
-  const T& top() const& { return *(buf_end_ptr - 1); }
+  T& top() { return *(buf_end_ptr - 1); }
+  const T& top() const { return *(buf_end_ptr - 1); }
+
+  T* data() { return buf_begin_ptr; }
+  const T* data() const { return buf_begin_ptr; }
 
   void clear() noexcept { std::destroy(buf_begin_ptr, buf_end_ptr); }
 
