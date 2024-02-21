@@ -154,7 +154,7 @@ class vector {
 
   bool empty() const noexcept { return (size() == 0); }
 
-  it end() const { return it{buf_end_ptr}; }
   it begin() const { return it{buf_begin_ptr}; }
+  it end() const { return it{buf_end_ptr}; }
 };
 }  // namespace containers

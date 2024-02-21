@@ -43,8 +43,24 @@ class shell_matrix {
 
   static shell_matrix identity(std::size_t sz) {
     shell_matrix ret{sz, sz};
-    // need iterator
-    for (std::size_t i = 0; i != sz; ++i) {};
+    it leap = ret.begin();
+    for (std::size_t i = 0; i != sz; ++i, leap += sz + 1) {
+      *leap = 1;
+    };
+    return ret;
   }
+
+  it begin() const { return m_buffer.begin(); }
+  it end() const { return m_buffer.end(); }
+
+ private:
+  class proxy_row {
+   private:
+    T *row_ptr, row_end_ptr;
+
+   public:
+    proxy_row() = default;
+    proxy_row(T* begin_ptr, std::size_t cols) : {}
+  };
 };
 }  // namespace linmath
