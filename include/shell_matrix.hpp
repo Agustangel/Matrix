@@ -44,9 +44,8 @@ class shell_matrix {
   static shell_matrix identity(std::size_t sz) {
     shell_matrix ret{sz, sz};
     it leap = ret.begin();
-    for (std::size_t i = 0; i != sz; ++i, leap += sz + 1) {
+    for (std::size_t i = 0; i != sz; ++i, leap += sz + 1)
       *leap = 1;
-    };
     return ret;
   }
 
@@ -77,36 +76,99 @@ class shell_matrix {
     return proxy_row{&m_buffer[idx * n_cols], n_cols};
   }
 
+  shell_matrix& operator+=(const shell_matrix& rhs) {
+    if ((n_rows != rhs.n_rows) || (n_cols != rhs.n_cols))
+      throw std::runtime_error("Unsuitable matrix sizes");
+
+    shell_matrix tmp{n_rows, n_cols, begin(), end()};
+    for (std::size_t i = 0; i < n_rows; ++i) {
+      for (std::size_t j = 0; j < n_cols; ++j)
+        tmp[i][j] += rhs[i][j];
+    }
+    *this = std::move(tmp);
+    return *this;
+  }
+
+  shell_matrix& operator-=(const shell_matrix& rhs) {
+    if ((n_rows != rhs.n_rows) || (n_cols != rhs.n_cols))
+      throw std::runtime_error("Unsuitable matrix sizes");
+
+    shell_matrix tmp{n_rows, n_cols, begin(), end()};
+    for (std::size_t i = 0; i < n_rows; ++i) {
+      for (std::size_t j = 0; j < n_cols; ++j)
+        tmp[i][j] -= rhs[i][j];
+    }
+    *this = std::move(tmp);
+    return *this;
+  }
+
+  shell_matrix& operator*=(const T rhs) {
+    shell_matrix tmp{n_rows, n_cols, begin(), end()};
+    for (std::size_t i = 0; i < n_rows; ++i) {
+      for (std::size_t j = 0; j < n_cols; ++j)
+        tmp[i][j] *= rhs;
+    }
+    *this = std::move(tmp);
+    return *this;
+  }
+
+  shell_matrix& operator/=(const T rhs) {
+    if (rhs == 0)
+      throw std::invalid_argument("Division by zero");
+
+    shell_matrix tmp{n_rows, n_cols, begin(), end()};
+    for (std::size_t i = 0; i < n_rows; ++i) {
+      for (std::size_t j = 0; j < n_cols; ++j)
+        tmp[i][j] /= rhs;
+    }
+    *this = std::move(tmp);
+    return *this;
+  }
+
+  // cache-friendly algorithm
+  shell_matrix& operator*=(const shell_matrix& rhs) {
+    if (n_cols != rhs.n_rows)
+      throw std::runtime_error("Unsuitable matrix sizes");
+
+    shell_matrix tmp{n_rows, n_cols, begin(), end()};
+    for (std::size_t k = 0; k < n_cols; ++k) {
+      for (std::size_t i = 0; i < n_rows; ++i) {
+        auto r = (*this)[i][k];
+        for (std::size_t j = 0; j < rhs.n_cols; ++j)
+          tmp[i][j] = r * rhs[k][j];
+      }
+    }
+    *this = std::move(tmp);
+    return *this;
+  }
+
+ public:
   T trace() const {
     if (n_rows != n_cols)
       throw std::runtime_error("Cannot get trace of non-square matrix");
-
     T trace{};
     it leap = begin();
-    for (std::size_t idx = 0; idx != n_cols; ++idx, leap += n_cols + 1) {
-      trc += *leap;
-    }
+    for (std::size_t idx = 0; idx != n_cols; ++idx, leap += n_cols + 1)
+      trace += *leap;
     return trace;
   }
 
   shell_matrix& transpose() & {
     static_assert(std::is_nothrow_move_assignable<T>::value);
+
     if (n_rows == n_cols) {
       for (std::size_t i = 0; i < n_rows; ++i) {
-        for (std::size_t j = 1; j < n_cols; ++j) {
+        for (std::size_t j = 1; j < n_cols; ++j)
           std::swap((*this)[i][j], (*this)[j][i]);
-        }
       }
       return *this;
     }
 
     shell_matrix transposed{n_cols, n_rows};
     for (std::size_t i = 0; i < n_rows; ++i) {
-      for (std::size_t j = 1; j < n_cols; ++j) {
+      for (std::size_t j = 1; j < n_cols; ++j)
         transposed[j][i] = std::move((*this)[i][j]);
-      }
     }
-
     *this = std::move(transposed);
     return *this;
   }
@@ -126,6 +188,7 @@ class shell_matrix {
 
   std::size_t ncols() const { return n_cols; }
   std::size_t nrows() const { return n_rows; }
+  bool square() const { return nrows() == ncols(); }
 
   it begin() const { return m_buffer.begin(); }
   it end() const { return m_buffer.end(); }
