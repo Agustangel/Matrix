@@ -93,8 +93,8 @@ class vector {
     return *this;
   }
 
-  T& operator[](unsigned i) { return *(buf_begin_ptr + i); }
-  const T& operator[](unsigned i) const { return *(buf_begin_ptr + i); }
+  T& operator[](std::size_t i) { return *(buf_begin_ptr + i); }
+  const T& operator[](std::size_t i) const { return *(buf_begin_ptr + i); }
 
  private:
   void expand(std::size_t cap) {
