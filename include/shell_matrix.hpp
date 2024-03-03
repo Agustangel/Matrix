@@ -50,9 +50,6 @@ class shell_matrix {
     return ret;
   }
 
-  it begin() const { return m_buffer.begin(); }
-  it end() const { return m_buffer.end(); }
-
  private:
   class proxy_row {
    private:
@@ -60,7 +57,27 @@ class shell_matrix {
 
    public:
     proxy_row() = default;
-    proxy_row(T* begin_ptr, std::size_t cols) : {}
+    proxy_row(const T* begin_ptr, std::size_t cols)
+        : row_ptr{begin_ptr}, row_end_ptr{row_ptr + cols} {}
+
+    T& operator[](unsigned idx) { return row_ptr[idx]; }
+    const T& operator[](unsigned idx) const { return row_ptr[idx]; }
+
+    it begin() const { return m_buffer.begin(); }
+    it end() const { return m_buffer.end(); }
+
+    std::size_t size() const { return row_ptr - row_end_ptr; }
   };
+
+ public:
+  proxy_row& operator[](unsigned idx) {
+    return proxy_row{&m_buffer[idx * n_cols], n_cols};
+  }
+  const proxy_row& operator[](unsigned idx) const {
+    return proxy_row{&m_buffer[idx * n_cols], n_cols};
+  }
+
+  std::size_t ncols() const { return n_cols; }
+  std::size_t nrows() const { return n_rows; }
 };
 }  // namespace linmath
