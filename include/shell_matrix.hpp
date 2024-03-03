@@ -16,6 +16,12 @@
 
 namespace linmath {
 
+// Precision, which be used for floating point comparisons
+template <typename T>
+struct default_precision {
+  static constexpr T prec = 1.0e-6f;
+};
+
 template <typename T>
 class shell_matrix {
  private:
@@ -171,6 +177,25 @@ class shell_matrix {
     }
     *this = std::move(transposed);
     return *this;
+  }
+
+  bool is_equal(const T& lhs, const T& rhs,
+                T precession = default_precision<T>::prec) const {
+    return (std::abs(lhs - rhs) <= precession);
+  }
+
+  bool equel(const shell_matrix& rhs) const {
+    if ((n_rows != rhs.n_rows) || (n_cols != rhs.n_cols))
+      return false;
+
+    bool answ = true;
+    T precession =
+        std::is_floating_point<T>::value ? default_precision<T>::prec : 0;
+    for (std::size_t i = 0; i < n_rows; ++i) {
+      for (std::size_t j = 0; j < n_cols; ++j)
+        answ &= is_equal((*this)[i][j], rhs[i][j], precession);
+    }
+    return answ;
   }
 
   void dump(std::ostream& os) const {
