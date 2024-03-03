@@ -111,6 +111,19 @@ class shell_matrix {
     return *this;
   }
 
+  void dump(std::ostream& os) const {
+    os << "n_rows = " << n_rows << std::endl;
+    os << "n_cols = " << n_cols << std::endl;
+
+    for (std::size_t i = 0; i < n_rows; ++i) {
+      os << "| ";
+      for (std::size_t j = 0; j < n_cols; ++j) {
+        os << (*this)[i][j] << " ";
+      }
+      os << "|" << std::endl;
+    }
+  }
+
   std::size_t ncols() const { return n_cols; }
   std::size_t nrows() const { return n_rows; }
 
