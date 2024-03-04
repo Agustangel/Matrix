@@ -33,8 +33,8 @@ class shell_matrix {
  public:
   using it = iterator::myIterator<T>;
 
-  shell_matrix(std::size_t rows, std::size_t cols, T val_ = T{})
-      : n_rows{rows}, n_cols{cols}, m_buffer{rows * cols, val_} {}
+  shell_matrix(std::size_t rows, std::size_t cols, T val = T{})
+      : n_rows{rows}, n_cols{cols}, m_buffer{rows * cols, val} {}
 
   shell_matrix(std::size_t rows, std::size_t cols, T* frst, T* lst)
       : n_rows{rows}, n_cols{cols}, m_buffer{frst, lst} {}
@@ -52,6 +52,14 @@ class shell_matrix {
     it leap = ret.begin();
     for (std::size_t i = 0; i != sz; ++i, leap += sz + 1)
       *leap = 1;
+    return ret;
+  }
+
+  static shell_matrix diag(std::size_t sz, it start, it finish) {
+    shell_matrix ret{sz, sz};
+    for (std::size_t i = 0; (i != sz) && (start != finish); ++i, ++start) {
+      ret[i][i] = *start;
+    }
     return ret;
   }
 
