@@ -59,15 +59,67 @@ class matrix {
   }
 
  private:
+  // TODO: copy ptr rows to rows_vec
   void reserve_rows_vec() { rows_vec.expand(nrows()); }
 
+  class proxy_row {
+   private:
+    T *row_ptr, row_end_ptr;
+
+   public:
+    proxy_row() = default;
+    proxy_row(const T* begin_ptr, std::size_t cols)
+        : row_ptr{begin_ptr}, row_end_ptr{row_ptr + cols} {}
+
+    T& operator[](std::size_t idx) { return row_ptr[idx]; }
+    const T& operator[](std::size_t idx) const { return row_ptr[idx]; }
+
+    it begin() const { return it{row_ptr}; }
+    it end() const { return it{row_end_ptr}; }
+
+    std::size_t size() const { return row_ptr - row_end_ptr; }
+  };
+
  public:
-  std::size_t nrows() const { return shell_matrix.rows(); }
-  std::size_t ncols() const { return shell_matrix.cols(); }
+  proxy_row& operator[](unsigned idx) {
+    return proxy_row{rows_vec[idx], ncols()};
+  }
+  const proxy_row& operator[](unsigned idx) const {
+    return proxy_row{rows_vec[idx], ncols()};
+  }
+
+  matrix& operator*=(T value) {
+    m_shell_matrix *= value;
+    return *this;
+  }
+
+  matrix& operator/=(T value) {
+    m_shell_matrix /= value;
+    return *this;
+  }
+
+  matrix& operator+=(const matrix& rhs) {
+    m_shell_matrix += rhs.m_shell_matrix;
+    return *this;
+  }
+
+  matrix& operator-=(const matrix& rhs) {
+    m_shell_matrix -= rhs.m_shell_matrix;
+    return *this;
+  }
+
+  matrix& operator*=(const matrix& rhs) {
+    m_shell_matrix *= rhs.m_shell_matrix;
+    return *this;
+  }
+
+ public:
+  std::size_t nrows() const { return m_shell_matrix.rows(); }
+  std::size_t ncols() const { return m_shell_matrix.cols(); }
 
   bool square() const { return nrows() == ncols(); }
 
-  it begin() const { return shell_matrix.begin(); }
-  it end() const { return shell_matrix.end(); }
+  it begin() const { return m_shell_matrix.begin(); }
+  it end() const { return m_shell_matrix.end(); }
 };
 }  // namespace linmath
