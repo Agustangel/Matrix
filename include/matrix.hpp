@@ -20,7 +20,7 @@ template <typename T>
 class matrix {
  private:
   shell_matrix<T> m_shell_matrix;
-  containers::vector<T> rows_vec;
+  containers::vector<T*> rows_vec;
 
  public:
   using it = iterator::myIterator<T>;
@@ -59,8 +59,15 @@ class matrix {
   }
 
  private:
-  // TODO: copy ptr rows to rows_vec
-  void reserve_rows_vec() { rows_vec.expand(nrows()); }
+  void reserve_rows_vec() {
+    std::size_t n_cols = ncols();
+    std::size_t n_rows = nrows();
+
+    rows_vec.reserve(n_rows);
+    for (std::size_t idx = 0; idx != n_rows; ++idx) {
+      rows_vec[idx] = m_shell_matrix.data() + idx * n_cols;
+    }
+  }
 
   class proxy_row {
    private:

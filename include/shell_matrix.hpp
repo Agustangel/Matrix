@@ -223,6 +223,9 @@ class shell_matrix {
   std::size_t nrows() const { return n_rows; }
   bool square() const { return nrows() == ncols(); }
 
+  T* data() { return m_buffer.data(); }
+  const T* data() const { return m_buffer.data(); }
+
   it begin() const { return m_buffer.begin(); }
   it end() const { return m_buffer.end(); }
 };

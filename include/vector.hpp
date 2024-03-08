@@ -36,7 +36,7 @@ class vector {
 
   explicit vector(std::size_t count, T val = T{}) {
     vector<T> tmp{};
-    tmp.expand(count);
+    tmp.reserve(count);
     std::fill_n(std::back_inserter(tmp), count, val);
 
     *this = std::move(tmp);
@@ -63,7 +63,7 @@ class vector {
 
   vector(vector& rhs) {
     vector tmp{};
-    tmp.expand(rhs.capacity());
+    tmp.reserve(rhs.capacity());
 
     std::size_t sz = rhs.size();
     if constexpr (std::is_trivially_copyable<T>::value)
@@ -97,7 +97,7 @@ class vector {
   const T& operator[](std::size_t i) const { return *(buf_begin_ptr + i); }
 
  private:
-  void expand(std::size_t cap) {
+  void reserve(std::size_t cap) {
     if (cap <= capacity())
       return;
 
@@ -116,10 +116,10 @@ class vector {
     buf_capacity_ptr += cap;
   }
 
-  void expand_if_neccessary() {
+  void reserve_if_neccessary() {
     if (buf_capacity_ptr - buf_end_ptr > 0)
       return;
-    expand(amortized(capacity()));
+    reserve(amortized(capacity()));
   }
 
  public:
@@ -128,12 +128,12 @@ class vector {
   }
 
   void push_back(T&& value) {
-    expand_if_neccessary();
+    reserve_if_neccessary();
     new (buf_end_ptr++) T{std::move(value)};
   }
 
   void push_back(const T& value) {
-    expand_if_neccessary();
+    reserve_if_neccessary();
     new (buf_end_ptr++) T{value};  // new gives a strict guarantee
   }
 
@@ -151,6 +151,9 @@ class vector {
   std::size_t capacity() const noexcept {
     return buf_capacity_ptr - buf_begin_ptr;
   }
+
+  T* data() { return buf_begin_ptr; }
+  const T* data() const { return buf_begin_ptr; }
 
   bool empty() const noexcept { return (size() == 0); }
 
