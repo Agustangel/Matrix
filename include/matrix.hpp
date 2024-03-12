@@ -143,9 +143,22 @@ class matrix {
     std::swap(m_rows_vec[idx1], m_rows_vec[idx2]);
   }
 
+  void convert_to_upper_triangle(int& sign) {}
+
   T determinant() const {
     if (!square())
       throw std::runtime_error("Unsuitable matrix size for determinant");
+
+    int sign = 1;
+    matrix tmp{*this};
+    tmp.convert_to_upper_triangle(sign);
+
+    T val = static_cast<T>(sign);
+    for (std::size_t i = 0; i < rows(); ++i) {
+      val *= tmp[i][i];
+    }
+
+    return val;
   }
 
   std::size_t nrows() const { return m_shell_matrix.rows(); }
