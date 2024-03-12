@@ -20,28 +20,28 @@ template <typename T>
 class matrix {
  private:
   shell_matrix<T> m_shell_matrix;
-  containers::vector<T*> rows_vec;
+  containers::vector<T*> m_m_rows_vec;
 
  public:
   using it = iterator::myIterator<T>;
 
   matrix(std::size_t rows, std::size_t cols, T val = T{})
       : m_shell_matrix{rows, cols, val} {
-    reserve_rows_vec();
+    reserve_m_rows_vec();
   }
 
   matrix(std::size_t rows, std::size_t cols, T* frst, T* lst)
       : m_shell_matrix{rows, cols, frst, lst} {
-    reserve_rows_vec();
+    reserve_m_rows_vec();
   }
 
   matrix(std::size_t rows, std::size_t cols, std::initializer_list<T> list)
       : m_shell_matrix{rows, cols, list} {
-    reserve_rows_vec();
+    reserve_m_rows_vec();
   }
 
   matrix(shell_matrix<T>&& rhs) : m_shell_matrix(std::move(rhs)) {
-    reserve_rows_vec();
+    reserve_m_rows_vec();
   }
 
   static matrix zero(std::size_t rows, std::size_t cols) {
@@ -63,9 +63,9 @@ class matrix {
     std::size_t n_cols = ncols();
     std::size_t n_rows = nrows();
 
-    rows_vec.reserve(n_rows);
+    m_rows_vec.reserve(n_rows);
     for (std::size_t idx = 0; idx != n_rows; ++idx) {
-      rows_vec[idx] = m_shell_matrix.data() + idx * n_cols;
+      m_rows_vec[idx] = m_shell_matrix.data() + idx * n_cols;
     }
   }
 
@@ -89,10 +89,10 @@ class matrix {
 
  public:
   proxy_row& operator[](unsigned idx) {
-    return proxy_row{rows_vec[idx], ncols()};
+    return proxy_row{m_rows_vec[idx], ncols()};
   }
   const proxy_row& operator[](unsigned idx) const {
-    return proxy_row{rows_vec[idx], ncols()};
+    return proxy_row{m_rows_vec[idx], ncols()};
   }
 
   matrix& operator*=(T value) {
@@ -121,6 +121,33 @@ class matrix {
   }
 
  public:
+  bool equel(const matrix& rhs) {
+    return m_shell_matrix.equel(rhs.m_shell_matrix);
+  }
+
+  matrix& transpose() & {
+    static_assert(std::is_nothrow_move_assignable<T>::value);
+
+    auto n_rows = nrows();
+    auto n_cols = ncols();
+    matrix transposed{n_rows, n_cols};
+    for (std::size_t i = 0; i < n_rows; ++i) {
+      for (std::size_t j = 1; j < n_cols; ++j)
+        transposed[j][i] = std::move((*this)[i][j]);
+    }
+    *this = std::move(transposed);
+    return *this;
+  }
+
+  void swap_rows(std::size_t idx1, std::size_t idx2) {
+    std::swap(m_rows_vec[idx1], m_rows_vec[idx2]);
+  }
+
+  T determinant() const {
+    if (!square())
+      throw std::runtime_error("Unsuitable matrix size for determinant");
+  }
+
   std::size_t nrows() const { return m_shell_matrix.rows(); }
   std::size_t ncols() const { return m_shell_matrix.cols(); }
 
