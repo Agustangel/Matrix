@@ -139,21 +139,43 @@ class matrix {
     return *this;
   }
 
+ private:
   void swap_rows(std::size_t idx1, std::size_t idx2) {
     std::swap(m_rows_vec[idx1], m_rows_vec[idx2]);
   }
 
-  void convert_to_upper_triangle(int& sign) {}
+  std::pair<T, std::size_t> get_greater_in_col(std::size_t col_num,
+                                               std::size_t row_pos) const {}
 
+  int convert_to_upper_triangle() {
+    int sign = 1;
+    for (std::size_t i = 0; i < ncols(); ++i) {
+      auto ret = get_greater_in_col(i, i);
+      if (ret.first() == T{})
+        return 0;
+      if (ret.second() != i) {
+        swap_rows(ret.second(), i);
+        sign *= -1;
+      }
+      for (std::size_t j = 0; j < nrows(); ++j) {
+        auto coef = ret.first();
+        // Gauss method
+      }
+    }
+    return sign;
+  }
+
+ public:
   T determinant() const {
     if (!square())
       throw std::runtime_error("Unsuitable matrix size for determinant");
 
-    int sign = 1;
     matrix tmp{*this};
-    tmp.convert_to_upper_triangle(sign);
+    auto ret = tmp.convert_to_upper_triangle();
+    if (!ret)
+      return T{};
 
-    T val = static_cast<T>(sign);
+    T val = ret.value();
     for (std::size_t i = 0; i < rows(); ++i) {
       val *= tmp[i][i];
     }
