@@ -182,22 +182,72 @@ class matrix {
     return sign;
   }
 
- public:
   T float_determinant() const requires std::is_floating_point<T>::value {
-    if (!square())
-      throw std::runtime_error("Unsuitable matrix size for determinant");
-
-    matrix tmp{*this};
-    auto ret = tmp.convert_to_upper_triangle();
+    matrix matr{*this};
+    auto ret = matr.convert_to_upper_triangle();
     if (!ret)
       return T{};
 
-    T val = ret.value();
+    T det = ret.value();
     for (std::size_t i = 0; i < rows(); ++i) {
-      val *= tmp[i][i];
+      det *= matr[i][i];
     }
 
-    return val;
+    return det;
+  }
+
+  matrix get_matrix_without_row_and_col(matrix& matr, std::size_t row_num,
+                                        std::size_t col_num) {
+    int offset_row{}, offset_col{};
+    std::size_t size = matr.nrows();
+    matrix tmp{size - 1, size - 1};
+
+    for (std::size_t i = 0; i < size - 1; ++i) {
+      if (i == row_num)
+        offset_row = 1;
+      offset_col = 0;
+      for (std::size_t j = 0; j < size - 1; ++j) {
+        if (j == col_num)
+          offset_col = 1;
+        tmp[i][j] = matr[i + offset_row][j + offset_col];
+      }
+    }
+    return tmp;
+  }
+
+  T recursive_determinant(matrix& matr, std::size_t matr_size) const {
+    if (!square())
+      throw std::runtime_error("Unsuitable matrix size for determinant");
+
+    int sign = 1;
+    int det = 0;
+
+    if (matr_size == 1) {
+      det = matr[0][0];
+    } else if (matr_size == 2) {
+      det = matr[0][0] * matr[1][1] - matr[0][1] * matr[1][0];
+    } else {
+      matrix tmp{matr_size - 1, matr_size - 1};
+      for (std::size_t i = 0; i < matr_size; ++i) {
+        tmp = get_matrix_without_row_and_col(matr, 0, i);
+        det += sign * matr[0][i] * recursive_determinant(tmp, matr_size - 1);
+        sign *= -1;
+      }
+    }
+    return det;
+  }
+
+ public:
+  T determinant() const {
+    if (!square())
+      throw std::runtime_error("Unsuitable matrix size for determinant");
+
+    int det = 0;
+    if (std::is_floating_point<T>::value)
+      det = float_determinant();
+    else
+      det = recursive_determinant(*this, (*this).nrows());
+    return det;
   }
 
   std::size_t nrows() const { return m_shell_matrix.rows(); }
