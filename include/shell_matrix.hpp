@@ -35,12 +35,17 @@ class shell_matrix {
   shell_matrix(std::size_t rows, std::size_t cols, T val = T{})
       : n_rows{rows}, n_cols{cols}, m_buffer{rows * cols, val} {}
 
-  shell_matrix(std::size_t rows, std::size_t cols, T* frst, T* lst)
-      : n_rows{rows}, n_cols{cols}, m_buffer{frst, lst} {}
+  template <std::input_iterator it>
+  shell_matrix(std::size_t rows, std::size_t cols, it frst, it lst)
+      : shell_matrix{rows, cols} {
+    std::size_t count = rows * cols;
+    std::copy_if(frst, lst, m_buffer.begin(),
+                 [&count](const auto&) { return count && count--; });
+  }
 
   shell_matrix(std::size_t rows, std::size_t cols,
                std::initializer_list<T> list)
-      : n_rows{rows}, n_cols{cols}, m_buffer{list.begin(), list.end()} {}
+      : shell_matrix{rows, cols, list.begin(), list.end()} {}
 
   static shell_matrix zero(std::size_t rows, std::size_t cols) {
     return shell_matrix{rows, cols};
@@ -101,10 +106,10 @@ class shell_matrix {
   };
 
  public:
-  proxy_row& operator[](unsigned idx) {
+  proxy_row operator[](unsigned idx) {
     return proxy_row{&m_buffer[idx * n_cols], n_cols};
   }
-  const_proxy_row& operator[](unsigned idx) const {
+  const_proxy_row operator[](unsigned idx) const {
     return proxy_row{&m_buffer[idx * n_cols], n_cols};
   }
 

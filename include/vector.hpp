@@ -36,14 +36,7 @@ class vector {
   explicit vector(std::size_t count, T val = T{}) {
     vector tmp{};
     tmp.reserve(count);
-    std::fill_n(std::back_inserter(tmp), count, val);
-    *this = std::move(tmp);
-  }
-
-  template <std::input_iterator iter>
-  vector(iter frst, iter lst) {
-    vector tmp{};
-    std::copy(frst, lst, std::back_inserter(tmp));
+    std::fill_n(tmp.end(), count, val);
     *this = std::move(tmp);
   }
 

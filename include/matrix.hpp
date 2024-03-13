@@ -104,10 +104,10 @@ class matrix {
   };
 
  public:
-  proxy_row& operator[](std::size_t idx) {
+  proxy_row operator[](std::size_t idx) {
     return proxy_row{m_rows_vec[idx], ncols()};
   }
-  const_proxy_row& operator[](std::size_t idx) const {
+  const_proxy_row operator[](std::size_t idx) const {
     return const_proxy_row{m_rows_vec[idx], ncols()};
   }
 
