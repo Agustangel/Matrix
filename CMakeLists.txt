@@ -38,4 +38,25 @@ add_executable(
   tests/test_vector.cpp
 )
 
+target_link_libraries(
+  test_matrix
+  GTest::gtest_main
+)
+target_link_libraries(
+  test_shell_matrix
+  GTest::gtest_main
+)
+target_link_libraries(
+  test_vector
+  GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(test_matrix)
+gtest_discover_tests(test_shell_matrix)
+gtest_discover_tests(test_vector)
+
 target_include_directories(matrix PUBLIC include)
+target_include_directories(test_matrix PUBLIC include)
+target_include_directories(test_shell_matrix PUBLIC include)
+target_include_directories(test_vector PUBLIC include)
