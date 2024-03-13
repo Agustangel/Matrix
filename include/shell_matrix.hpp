@@ -24,7 +24,6 @@ struct default_precision {
 
 template <typename T>
 class shell_matrix {
- private:
   std::size_t n_rows = 0;
   std::size_t n_cols = 0;
 
@@ -66,14 +65,33 @@ class shell_matrix {
  private:
   class proxy_row {
    private:
-    T *row_ptr, row_end_ptr;
+    T* row_ptr = nullptr;
+    T* row_end_ptr = nullptr;
 
    public:
     proxy_row() = default;
-    proxy_row(const T* begin_ptr, std::size_t cols)
+    proxy_row(T* begin_ptr, std::size_t cols)
         : row_ptr{begin_ptr}, row_end_ptr{row_ptr + cols} {}
 
     T& operator[](std::size_t idx) { return row_ptr[idx]; }
+    const T& operator[](std::size_t idx) const { return row_ptr[idx]; }
+
+    it begin() const { return it{row_ptr}; }
+    it end() const { return it{row_end_ptr}; }
+
+    std::size_t size() const { return row_ptr - row_end_ptr; }
+  };
+
+  class const_proxy_row {
+   private:
+    const T* row_ptr;
+    const T* row_end_ptr;
+
+   public:
+    const_proxy_row() = default;
+    const_proxy_row(const T* begin_ptr, std::size_t cols)
+        : row_ptr{begin_ptr}, row_end_ptr{row_ptr + cols} {}
+
     const T& operator[](std::size_t idx) const { return row_ptr[idx]; }
 
     it begin() const { return it{row_ptr}; }
@@ -86,7 +104,7 @@ class shell_matrix {
   proxy_row& operator[](unsigned idx) {
     return proxy_row{&m_buffer[idx * n_cols], n_cols};
   }
-  const proxy_row& operator[](unsigned idx) const {
+  const_proxy_row& operator[](unsigned idx) const {
     return proxy_row{&m_buffer[idx * n_cols], n_cols};
   }
 

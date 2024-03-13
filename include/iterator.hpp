@@ -6,7 +6,6 @@
 namespace iterator {
 template <typename T>
 class myIterator {
- private:
   T* ptr = nullptr;
 
  public:

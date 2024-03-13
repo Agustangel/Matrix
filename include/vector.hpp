@@ -18,7 +18,6 @@ static constexpr unsigned BOOST_ARCH_WORD_BITS = 32;
 
 template <typename T>
 class vector {
- private:
   T* buf_begin_ptr = nullptr;
   T* buf_end_ptr = nullptr;
   T* buf_capacity_ptr = nullptr;
@@ -32,28 +31,27 @@ class vector {
       : buf_begin_ptr{static_cast<T*>(
             ::operator new(sizeof(T) * default_capacity))},
         buf_capacity_ptr{buf_begin_ptr + default_capacity},
-        buf_end_ptr{buf_begin_ptr} {};
+        buf_end_ptr{buf_begin_ptr} {}
 
   explicit vector(std::size_t count, T val = T{}) {
-    vector<T> tmp{};
+    vector tmp{};
     tmp.reserve(count);
     std::fill_n(std::back_inserter(tmp), count, val);
-
     *this = std::move(tmp);
-  };
+  }
 
-  vector(T* frst, T* lst) {
-    vector<T> tmp{};
+  template <std::input_iterator iter>
+  vector(iter frst, iter lst) {
+    vector tmp{};
     std::copy(frst, lst, std::back_inserter(tmp));
-
     *this = std::move(tmp);
-  };
+  }
 
   ~vector() {
     std::destroy(buf_begin_ptr, buf_end_ptr);
     buf_end_ptr = buf_begin_ptr;
     ::operator delete(buf_begin_ptr);
-  };
+  }
 
   vector(vector&& rhs) noexcept {
     std::swap(buf_begin_ptr, rhs.buf_begin_ptr);
@@ -96,7 +94,6 @@ class vector {
   T& operator[](std::size_t i) { return *(buf_begin_ptr + i); }
   const T& operator[](std::size_t i) const { return *(buf_begin_ptr + i); }
 
- private:
   void reserve(std::size_t cap) {
     if (cap <= capacity())
       return;
@@ -122,7 +119,6 @@ class vector {
     reserve(amortized(capacity()));
   }
 
- public:
   std::size_t amortized(std::size_t sz) const {
     return std::size_t{1} << (BOOST_ARCH_WORD_BITS - __builtin_clz(sz));
   }
