@@ -144,29 +144,46 @@ class matrix {
     std::swap(m_rows_vec[idx1], m_rows_vec[idx2]);
   }
 
-  std::pair<T, std::size_t> get_greater_in_col(std::size_t col_num,
-                                               std::size_t row_pos) const {}
+  bool is_greater(const T& lhs, const T& rhs,
+                  T precession = default_precision<T>::prec) const {
+    return (std::abs(lhs - rhs) > precession);
+  }
 
-  int convert_to_upper_triangle() {
+  std::pair<T, std::size_t> get_greater_in_col(std::size_t col_num,
+                                               std::size_t row_pos) const {
+    T max = m_shell_matrix[row_pos][col_num];
+    std::size_t max_pos = row_pos;
+    for (std::size_t i = row_pos + 1; row_pos < nrows(); ++row_pos) {
+      if (is_greater(m_shell_matrix[i][col_num], max)) {
+        max = m_shell_matrix[i][col_num];
+        max_pos = i;
+      }
+    }
+    return std::make_pair<max, max_pos>;
+  }
+
+  std::optional<int> convert_to_upper_triangle()
+      requires std::is_floating_point<T>::value {
     int sign = 1;
     for (std::size_t i = 0; i < ncols(); ++i) {
       auto ret = get_greater_in_col(i, i);
       if (ret.first() == T{})
-        return 0;
+        return std::nullopt;
       if (ret.second() != i) {
         swap_rows(ret.second(), i);
         sign *= -1;
       }
-      for (std::size_t j = 0; j < nrows(); ++j) {
-        auto coef = ret.first();
-        // Gauss method
+      for (std::size_t j = i + 1; j < nrows(); ++j) {
+        auto coef = m_shell_matrix[j][i] / ret.first();
+        for (std::size_t n_elem = i; n_elem < ncols(); ++n_elem)
+          m_shell_matrix[j][n_elem] -= coef * m_shell_matrix[i][n_elem];
       }
     }
     return sign;
   }
 
  public:
-  T determinant() const {
+  T float_determinant() const requires std::is_floating_point<T>::value {
     if (!square())
       throw std::runtime_error("Unsuitable matrix size for determinant");
 
