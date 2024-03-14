@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <concepts>
-#include <cstddef>
 #include <functional>
 #include <initializer_list>
 #include <iostream>
@@ -10,7 +9,6 @@
 #include <limits>
 #include <optional>
 #include <stdexcept>
-#include <utility>
 #include "iterator.hpp"
 #include "shell_matrix.hpp"
 #include "vector.hpp"

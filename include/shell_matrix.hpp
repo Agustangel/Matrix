@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <concepts>
-#include <cstddef>
 #include <functional>
 #include <initializer_list>
 #include <iostream>
@@ -10,7 +9,6 @@
 #include <limits>
 #include <optional>
 #include <stdexcept>
-#include <utility>
 #include "iterator.hpp"
 #include "vector.hpp"
 
@@ -35,8 +33,8 @@ class shell_matrix {
   shell_matrix(std::size_t rows, std::size_t cols, T val = T{})
       : n_rows{rows}, n_cols{cols}, m_buffer{rows * cols, val} {}
 
-  template <std::input_iterator it>
-  shell_matrix(std::size_t rows, std::size_t cols, it frst, it lst)
+  template <std::input_iterator iter>
+  shell_matrix(std::size_t rows, std::size_t cols, iter frst, iter lst)
       : shell_matrix{rows, cols} {
     std::size_t count = rows * cols;
     std::copy_if(frst, lst, m_buffer.begin(),
