@@ -21,7 +21,7 @@ struct default_precision {
 };
 
 template <typename T>
-class shell_matrix {
+class shell_matrix final {
   std::size_t n_rows = 0;
   std::size_t n_cols = 0;
 
@@ -230,7 +230,6 @@ class shell_matrix {
   void dump(std::ostream& os) const {
     os << "n_rows = " << n_rows << std::endl;
     os << "n_cols = " << n_cols << std::endl;
-
     for (std::size_t i = 0; i < n_rows; ++i) {
       os << "| ";
       for (std::size_t j = 0; j < n_cols; ++j) {

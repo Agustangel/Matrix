@@ -134,6 +134,17 @@ class vector {
 
   void clear() noexcept { std::destroy(buf_begin_ptr, buf_end_ptr); }
 
+  void dump(std::ostream& os) const {
+    std::size_t sz = size();
+    std::size_t cap = capacity();
+    os << "size = " << sz << std::endl;
+    os << "capacity = " << cap << std::endl;
+    os << "| ";
+    for (std::size_t i = 0; i < sz; ++i)
+      os << (*this)[i] << " ";
+    os << "|" << std::endl;
+  }
+
   std::size_t size() const noexcept { return buf_end_ptr - buf_begin_ptr; }
   std::size_t capacity() const noexcept {
     return buf_capacity_ptr - buf_begin_ptr;
