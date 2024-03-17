@@ -34,7 +34,8 @@ class vector {
   explicit vector(std::size_t count, T val = T{}) {
     vector tmp{};
     tmp.reserve(count);
-    std::fill_n(tmp.end(), count, val);
+    if (val)
+      tmp.fill_n(count, val);
     *this = std::move(tmp);
   }
 
@@ -85,6 +86,15 @@ class vector {
   T& operator[](std::size_t i) { return *(buf_begin_ptr + i); }
   const T& operator[](std::size_t i) const { return *(buf_begin_ptr + i); }
 
+  void fill_n(std::size_t count, const T& value) {
+    if (count <= 0)
+      return;
+    it frst = (*this).begin();
+    for (std::size_t i = 0; i < count; ++i)
+      *frst++ = value;
+    buf_end_ptr = buf_begin_ptr + count;
+  }
+
   void reserve(std::size_t cap) {
     if (cap <= capacity())
       return;
@@ -101,7 +111,7 @@ class vector {
     ::operator delete(buf_begin_ptr);
     buf_begin_ptr = raii_buf.release();
     buf_end_ptr = buf_begin_ptr + sz;
-    buf_capacity_ptr += cap;
+    buf_capacity_ptr = buf_begin_ptr + cap;
   }
 
   void reserve_if_neccessary() {
