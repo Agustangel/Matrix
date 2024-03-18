@@ -92,7 +92,8 @@ class vector {
     it frst = (*this).begin();
     for (std::size_t i = 0; i < count; ++i)
       *frst++ = value;
-    buf_end_ptr = buf_begin_ptr + count;
+    if (value)
+      buf_end_ptr = buf_begin_ptr + count;
   }
 
   void reserve(std::size_t cap) {
