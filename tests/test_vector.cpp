@@ -9,10 +9,9 @@ using vector = typename containers::vector<int>;
 class VectorFixture : public ::testing::Test {
  public:
   vector* my_vec;
-  const std::size_t cap = 10;
 
  protected:
-  void SetUp() override { my_vec = new containers::vector<int>{cap}; }
+  void SetUp() override { my_vec = new containers::vector<int>{}; }
   void TearDown() override { delete my_vec; }
 };
 
@@ -25,8 +24,7 @@ TEST(test_vector, test_ctor_1) {
 
 TEST(test_vector, test_ctor_2) {
   vector my_vec{10};
-  ASSERT_EQ(my_vec.size(), 0);
-  ASSERT_TRUE(my_vec.empty());
+  ASSERT_EQ(my_vec.size(), 10);
   ASSERT_EQ(my_vec.capacity(), 10);
 }
 
@@ -49,6 +47,7 @@ TEST(test_vector, test_uptr) {
 }
 
 TEST_F(VectorFixture, push_pop_back) {
+  EXPECT_EQ(my_vec->size(), 0);
   for (std::size_t i = 0; i < 5; ++i) {
     my_vec->push_back(i);
     EXPECT_EQ(my_vec->size(), i + 1);
@@ -61,12 +60,14 @@ TEST_F(VectorFixture, push_pop_back) {
 }
 
 TEST_F(VectorFixture, test_reserve) {
-  std::size_t new_cap = cap * 2;
+  std::size_t new_cap = default_capacity * 2;
   my_vec->reserve(new_cap);
   EXPECT_EQ(my_vec->capacity(), new_cap);
 }
 
 TEST_F(VectorFixture, test_clear) {
+  for (auto i = 0; i < 10; i++)
+    my_vec->push_back(i);
   my_vec->clear();
   EXPECT_TRUE(my_vec->empty());
 }
