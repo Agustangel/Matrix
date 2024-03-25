@@ -250,4 +250,19 @@ class shell_matrix final {
   it begin() const { return m_buffer.begin(); }
   it end() const { return m_buffer.end(); }
 };
+
+// clang-format off
+template <typename T> shell_matrix<T> operator*(const shell_matrix<T> &lhs, T rhs) { auto res = lhs; res *= rhs; return res; }
+template <typename T> shell_matrix<T> operator*(T lhs, const shell_matrix<T> &rhs) { auto res = rhs; res *= lhs; return res; }
+
+template <typename T> shell_matrix<T> operator+(const shell_matrix<T> &lhs, const shell_matrix<T> &rhs) { auto res = lhs; res += rhs; return res; }
+template <typename T> shell_matrix<T> operator-(const shell_matrix<T> &lhs, const shell_matrix<T> &rhs) { auto res = lhs; res -= rhs; return res; }
+
+template <typename T> shell_matrix<T> operator*(const shell_matrix<T> &lhs, const shell_matrix<T> &rhs) { auto res = lhs; res *= rhs; return res; }
+template <typename T> shell_matrix<T> operator/(const shell_matrix<T> &lhs, T rhs) { auto res = lhs; res /= rhs; return res; }
+
+template <typename T> bool operator==(const shell_matrix<T> &lhs, const shell_matrix<T> &rhs) { return lhs.equal(rhs); }
+template <typename T> bool operator!=(const shell_matrix<T> &lhs, const shell_matrix<T> &rhs) { return !(lhs.equal(rhs)); }
+// clang-format on
+
 }  // namespace linmath
