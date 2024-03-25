@@ -34,8 +34,7 @@ class vector {
   explicit vector(std::size_t count, T val = T{}) {
     vector tmp{};
     tmp.reserve(count);
-    if (val)
-      tmp.fill_n(count, val);
+    tmp.fill_n(count, val);
     *this = std::move(tmp);
   }
 
@@ -92,8 +91,7 @@ class vector {
     it frst = (*this).begin();
     for (std::size_t i = 0; i < count; ++i)
       *frst++ = value;
-    if (value)
-      buf_end_ptr = buf_begin_ptr + count;
+    buf_end_ptr = buf_begin_ptr + count;
   }
 
   void reserve(std::size_t cap) {
@@ -143,7 +141,10 @@ class vector {
   T& top() { return *(buf_end_ptr - 1); }
   const T& top() const { return *(buf_end_ptr - 1); }
 
-  void clear() noexcept { std::destroy(buf_begin_ptr, buf_end_ptr); }
+  void clear() noexcept {
+    std::destroy(buf_begin_ptr, buf_end_ptr);
+    buf_end_ptr = buf_begin_ptr;
+  }
 
   void dump(std::ostream& os) const {
     std::size_t sz = size();

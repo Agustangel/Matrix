@@ -33,7 +33,7 @@ class shell_matrix final {
   shell_matrix(std::size_t rows, std::size_t cols, T val = T{})
       : n_rows{rows}, n_cols{cols}, m_buffer{rows * cols, val} {}
 
-  template <std::input_iterator iter>
+  template <typename iter>
   shell_matrix(std::size_t rows, std::size_t cols, iter frst, iter lst)
       : shell_matrix{rows, cols} {
     std::size_t count = rows * cols;
@@ -57,7 +57,8 @@ class shell_matrix final {
     return ret;
   }
 
-  static shell_matrix diag(std::size_t sz, it start, it finish) {
+  template <std::input_iterator iter>
+  static shell_matrix diag(std::size_t sz, iter start, iter finish) {
     shell_matrix ret{sz, sz};
     for (std::size_t i = 0; (i != sz) && (start != finish); ++i, ++start) {
       ret[i][i] = *start;
@@ -108,7 +109,7 @@ class shell_matrix final {
     return proxy_row{&m_buffer[idx * n_cols], n_cols};
   }
   const_proxy_row operator[](unsigned idx) const {
-    return proxy_row{&m_buffer[idx * n_cols], n_cols};
+    return const_proxy_row{&m_buffer[idx * n_cols], n_cols};
   }
 
   shell_matrix& operator+=(const shell_matrix& rhs) {
