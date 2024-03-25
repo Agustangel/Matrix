@@ -274,4 +274,19 @@ class matrix {
   it begin() const { return m_shell_matrix.begin(); }
   it end() const { return m_shell_matrix.end(); }
 };
+
+// clang-format off
+template <typename T> matrix<T> operator*(const matrix<T> &lhs, T rhs) { auto res = lhs; res *= rhs; return res; }
+template <typename T> matrix<T> operator*(T lhs, const matrix<T> &rhs) { auto res = rhs; res *= lhs; return res; }
+
+template <typename T> matrix<T> operator+(const matrix<T> &lhs, const matrix<T> &rhs) { auto res = lhs; res += rhs; return res; }
+template <typename T> matrix<T> operator-(const matrix<T> &lhs, const matrix<T> &rhs) { auto res = lhs; res -= rhs; return res; }
+
+template <typename T> matrix<T> operator*(const matrix<T> &lhs, const matrix<T> &rhs) { auto res = lhs; res *= rhs; return res; }
+template <typename T> matrix<T> operator/(const matrix<T> &lhs, T rhs) { auto res = lhs; res /= rhs; return res; }
+
+template <typename T> bool operator==(const matrix<T> &lhs, const matrix<T> &rhs) { return lhs.equal(rhs); }
+template <typename T> bool operator!=(const matrix<T> &lhs, const matrix<T> &rhs) { return !(lhs.equal(rhs)); }
+// clang-format on
+
 }  // namespace linmath
